@@ -1,0 +1,9 @@
+[     0s] features (cached unless --force)
+[     0s] signal figures
+[     3s] detection: threshold + SVM/RF/kNN, time-block CV
+[    47s] localization: RF, leave-one-flight-out (raw)
+[   352s] localization: RF, leave-one-flight-out (notch-filtered)
+[   735s] spectral energy change by fault type (descriptive; PADRE has no severity labels)
+[   735s] raw vs notch summary
+[   735s] leakage demo (deliberately invalid random-window split)
+[   752s] done

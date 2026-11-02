@@ -1,0 +1,9 @@
+# environment
+.venv/
+__pycache__/
+*.pyc
+# datasets (download with scripts/download_padre.py; third-party data, not redistributed)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep

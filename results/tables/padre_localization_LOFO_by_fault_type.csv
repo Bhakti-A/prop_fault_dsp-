@@ -1,0 +1,6 @@
+model,fault_type,n,pred_faulty,rate_pred_faulty
+RandomForest,0,20808,1017,0.049
+RandomForest,1,5508,4890,0.888
+RandomForest,2,5508,3742,0.679
+RandomForest,3,1224,917,0.749
+RandomForest,4,1224,1220,0.997

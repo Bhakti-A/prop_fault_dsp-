@@ -1,0 +1,334 @@
+{
+ "n_windows": 8568,
+ "n_flights": 28,
+ "detection_raw": {
+  "threshold_H1(acc_z)": {
+   "accuracy": 0.868,
+   "balanced_acc": 0.925,
+   "macro_F1": 0.637,
+   "recall_healthy": 0.987,
+   "recall_faulty": 0.864
+  },
+  "threshold_RMS(acc)": {
+   "accuracy": 0.969,
+   "balanced_acc": 0.973,
+   "macro_F1": 0.839,
+   "recall_healthy": 0.977,
+   "recall_faulty": 0.969
+  },
+  "SVM-RBF": {
+   "accuracy": 0.999,
+   "balanced_acc": 0.992,
+   "macro_F1": 0.994,
+   "recall_healthy": 0.984,
+   "recall_faulty": 1.0
+  },
+  "RandomForest": {
+   "accuracy": 0.998,
+   "balanced_acc": 0.977,
+   "macro_F1": 0.987,
+   "recall_healthy": 0.954,
+   "recall_faulty": 1.0
+  },
+  "kNN": {
+   "accuracy": 0.994,
+   "balanced_acc": 0.965,
+   "macro_F1": 0.956,
+   "recall_healthy": 0.935,
+   "recall_faulty": 0.996
+  }
+ },
+ "detection_notched": {
+  "threshold_H1(acc_z)": {
+   "accuracy": 0.401,
+   "balanced_acc": 0.683,
+   "macro_F1": 0.327,
+   "recall_healthy": 0.987,
+   "recall_faulty": 0.379
+  },
+  "threshold_RMS(acc)": {
+   "accuracy": 0.603,
+   "balanced_acc": 0.786,
+   "macro_F1": 0.446,
+   "recall_healthy": 0.984,
+   "recall_faulty": 0.589
+  },
+  "SVM-RBF": {
+   "accuracy": 0.998,
+   "balanced_acc": 0.975,
+   "macro_F1": 0.986,
+   "recall_healthy": 0.951,
+   "recall_faulty": 1.0
+  },
+  "RandomForest": {
+   "accuracy": 0.993,
+   "balanced_acc": 0.907,
+   "macro_F1": 0.947,
+   "recall_healthy": 0.814,
+   "recall_faulty": 1.0
+  },
+  "kNN": {
+   "accuracy": 0.989,
+   "balanced_acc": 0.887,
+   "macro_F1": 0.915,
+   "recall_healthy": 0.778,
+   "recall_faulty": 0.997
+  }
+ },
+ "localization_LOFO_raw": [
+  {
+   "model": "RandomForest",
+   "rotor": "A",
+   "accuracy": 0.964,
+   "balanced_acc": 0.954,
+   "macro_F1": 0.962,
+   "recall_healthy_rotor": 1.0,
+   "recall_faulty_rotor": 0.909
+  },
+  {
+   "model": "RandomForest",
+   "rotor": "B",
+   "accuracy": 0.914,
+   "balanced_acc": 0.91,
+   "macro_F1": 0.91,
+   "recall_healthy_rotor": 0.931,
+   "recall_faulty_rotor": 0.889
+  },
+  {
+   "model": "RandomForest",
+   "rotor": "C",
+   "accuracy": 0.924,
+   "balanced_acc": 0.904,
+   "macro_F1": 0.917,
+   "recall_healthy_rotor": 0.996,
+   "recall_faulty_rotor": 0.812
+  },
+  {
+   "model": "RandomForest",
+   "rotor": "D",
+   "accuracy": 0.765,
+   "balanced_acc": 0.734,
+   "macro_F1": 0.741,
+   "recall_healthy_rotor": 0.878,
+   "recall_faulty_rotor": 0.589
+  },
+  {
+   "model": "RandomForest",
+   "rotor": "ALL (exact 4-bit match, windows)",
+   "accuracy": 0.597,
+   "balanced_acc": NaN,
+   "macro_F1": NaN,
+   "recall_healthy_rotor": NaN,
+   "recall_faulty_rotor": NaN
+  },
+  {
+   "model": "RandomForest",
+   "rotor": "ALL (exact 4-bit match, flights, majority vote)",
+   "accuracy": 0.643,
+   "balanced_acc": NaN,
+   "macro_F1": NaN,
+   "recall_healthy_rotor": NaN,
+   "recall_faulty_rotor": NaN
+  },
+  {
+   "model": "RandomForest",
+   "rotor": "ALL (per-rotor acc, flights, majority vote)",
+   "accuracy": 0.902,
+   "balanced_acc": NaN,
+   "macro_F1": NaN,
+   "recall_healthy_rotor": NaN,
+   "recall_faulty_rotor": NaN
+  }
+ ],
+ "localization_LOFO_by_fault_type": [
+  {
+   "model": "RandomForest",
+   "fault_type": 0,
+   "n": 20808,
+   "pred_faulty": 1017,
+   "rate_pred_faulty": 0.049
+  },
+  {
+   "model": "RandomForest",
+   "fault_type": 1,
+   "n": 5508,
+   "pred_faulty": 4890,
+   "rate_pred_faulty": 0.888
+  },
+  {
+   "model": "RandomForest",
+   "fault_type": 2,
+   "n": 5508,
+   "pred_faulty": 3742,
+   "rate_pred_faulty": 0.679
+  },
+  {
+   "model": "RandomForest",
+   "fault_type": 3,
+   "n": 1224,
+   "pred_faulty": 917,
+   "rate_pred_faulty": 0.749
+  },
+  {
+   "model": "RandomForest",
+   "fault_type": 4,
+   "n": 1224,
+   "pred_faulty": 1220,
+   "rate_pred_faulty": 0.997
+  }
+ ],
+ "localization_LOFO_notched": [
+  {
+   "model": "RandomForest",
+   "rotor": "A",
+   "accuracy": 0.956,
+   "balanced_acc": 0.945,
+   "macro_F1": 0.953,
+   "recall_healthy_rotor": 0.994,
+   "recall_faulty_rotor": 0.897
+  },
+  {
+   "model": "RandomForest",
+   "rotor": "B",
+   "accuracy": 0.875,
+   "balanced_acc": 0.866,
+   "macro_F1": 0.869,
+   "recall_healthy_rotor": 0.91,
+   "recall_faulty_rotor": 0.822
+  },
+  {
+   "model": "RandomForest",
+   "rotor": "C",
+   "accuracy": 0.87,
+   "balanced_acc": 0.841,
+   "macro_F1": 0.856,
+   "recall_healthy_rotor": 0.974,
+   "recall_faulty_rotor": 0.708
+  },
+  {
+   "model": "RandomForest",
+   "rotor": "D",
+   "accuracy": 0.629,
+   "balanced_acc": 0.592,
+   "macro_F1": 0.592,
+   "recall_healthy_rotor": 0.764,
+   "recall_faulty_rotor": 0.42
+  },
+  {
+   "model": "RandomForest",
+   "rotor": "ALL (exact 4-bit match, windows)",
+   "accuracy": 0.411,
+   "balanced_acc": NaN,
+   "macro_F1": NaN,
+   "recall_healthy_rotor": NaN,
+   "recall_faulty_rotor": NaN
+  },
+  {
+   "model": "RandomForest",
+   "rotor": "ALL (exact 4-bit match, flights, majority vote)",
+   "accuracy": 0.429,
+   "balanced_acc": NaN,
+   "macro_F1": NaN,
+   "recall_healthy_rotor": NaN,
+   "recall_faulty_rotor": NaN
+  },
+  {
+   "model": "RandomForest",
+   "rotor": "ALL (per-rotor acc, flights, majority vote)",
+   "accuracy": 0.848,
+   "balanced_acc": NaN,
+   "macro_F1": NaN,
+   "recall_healthy_rotor": NaN,
+   "recall_faulty_rotor": NaN
+  }
+ ],
+ "energy_change_by_fault_type": {
+  "bent tip": {
+   "dH1_dB mean": 0.2,
+   "dH1_dB min": -12.9,
+   "dH1_dB max": 14.3,
+   "dH1_dB count": 4,
+   "dE_total_dB mean": 2.4,
+   "dE_total_dB min": -9.0,
+   "dE_total_dB max": 13.3,
+   "dE_total_dB count": 4,
+   "dRMS_dB mean": 2.1,
+   "dRMS_dB min": -9.6,
+   "dRMS_dB max": 13.3,
+   "dRMS_dB count": 4
+  },
+  "bent tip + cut-off tip": {
+   "dH1_dB mean": 23.3,
+   "dH1_dB min": 18.7,
+   "dH1_dB max": 26.4,
+   "dH1_dB count": 3,
+   "dE_total_dB mean": 19.3,
+   "dE_total_dB min": 13.8,
+   "dE_total_dB max": 22.7,
+   "dE_total_dB count": 3,
+   "dRMS_dB mean": 19.1,
+   "dRMS_dB min": 13.6,
+   "dRMS_dB max": 22.1,
+   "dRMS_dB count": 3
+  },
+  "chipped edge": {
+   "dH1_dB mean": 13.9,
+   "dH1_dB min": 0.8,
+   "dH1_dB max": 19.9,
+   "dH1_dB count": 4,
+   "dE_total_dB mean": 11.4,
+   "dE_total_dB min": 1.4,
+   "dE_total_dB max": 16.8,
+   "dE_total_dB count": 4,
+   "dRMS_dB mean": 11.6,
+   "dRMS_dB min": 1.2,
+   "dRMS_dB max": 17.3,
+   "dRMS_dB count": 4
+  },
+  "cut-off tip": {
+   "dH1_dB mean": 17.5,
+   "dH1_dB min": -1.1,
+   "dH1_dB max": 26.3,
+   "dH1_dB count": 4,
+   "dE_total_dB mean": 16.2,
+   "dE_total_dB min": 6.2,
+   "dE_total_dB max": 22.6,
+   "dE_total_dB count": 4,
+   "dRMS_dB mean": 15.9,
+   "dRMS_dB min": 5.6,
+   "dRMS_dB max": 22.4,
+   "dRMS_dB count": 4
+  }
+ },
+ "raw_vs_notch": {
+  "Detection, threshold on 1x level": {
+   "raw": 0.925,
+   "notched": 0.683
+  },
+  "Detection, threshold on RMS": {
+   "raw": 0.973,
+   "notched": 0.786
+  },
+  "Detection, SVM": {
+   "raw": 0.992,
+   "notched": 0.975
+  },
+  "Detection, RF": {
+   "raw": 0.977,
+   "notched": 0.907
+  },
+  "Localization, RF (LOFO, mean of 4 rotors)": {
+   "raw": 0.876,
+   "notched": 0.811
+  }
+ },
+ "leakage_demo": [
+  {
+   "task": "28-way rotor-configuration ID (which flight config)",
+   "split": "random windows (LEAKY, invalid)",
+   "accuracy": 0.992,
+   "balanced_acc": 0.992,
+   "macro_F1": 0.992
+  }
+ ]
+}
