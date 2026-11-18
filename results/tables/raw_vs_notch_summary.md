@@ -1,7 +1,0 @@
-|                                           |   raw |   notched |
-|:------------------------------------------|------:|----------:|
-| Detection, threshold on 1x level          | 0.925 |     0.683 |
-| Detection, threshold on RMS               | 0.973 |     0.786 |
-| Detection, SVM                            | 0.992 |     0.975 |
-| Detection, RF                             | 0.977 |     0.907 |
-| Localization, RF (LOFO, mean of 4 rotors) | 0.876 |     0.811 |

@@ -1,5 +1,5 @@
-"""Figures (static PNG for the report). Palette: validated default categorical order
-(blue, orange, aqua, yellow, magenta) used in fixed order; sequential blue ramp for matrices."""
+"""Static PNG figures for the report. Categorical palette in fixed order (blue, orange, aqua,
+yellow, magenta); sequential blue ramp for matrices."""
 from __future__ import annotations
 
 import os
@@ -10,8 +10,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 from scipy.signal import spectrogram, welch
-
-from features import make_windows, notch_windows, estimate_frot_robust
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FIG = os.path.join(ROOT, "results", "figures")
@@ -28,6 +26,7 @@ plt.rcParams.update({
     "axes.spines.top": False, "axes.spines.right": False, "lines.linewidth": 1.6,
     "font.size": 9, "axes.titlesize": 10, "legend.frameon": False, "figure.dpi": 130,
 })
+MOTORS = ["M1", "M2", "M3", "M4"]
 
 
 def _save(fig, name):
@@ -37,191 +36,199 @@ def _save(fig, name):
     return p
 
 
-def _psd(x, fs, nperseg):
-    f, p = welch(x - x.mean(), fs, nperseg=nperseg)
-    return f, 10 * np.log10(p + 1e-20)
-
-
-def padre_psd(recs, codes=("0000", "1000", "2000", "3000", "4000")):
-    by = {r.meta["code"]: r for r in recs}
-    names = {"0000": "0000 healthy", "1000": "1000 A chipped edge", "2000": "2000 A bent tip",
-             "3000": "3000 A cut-off tip", "4000": "4000 A bent+cut"}
-    fig, axes = plt.subplots(1, 4, figsize=(13, 3.2), sharey=True)
-    for j, rot in enumerate("ABCD"):
-        ax = axes[j]
-        ch = by["0000"].ch_names.index(f"{rot}_acc_z")
-        for k, c in enumerate(codes):
-            f, p = _psd(by[c].signals[ch], 500, 512)
-            ax.plot(f, p, color=SERIES[k], label=names[c], lw=1.2)
-        ax.set_title(f"IMU {rot}, acc z")
-        ax.set_xlabel("Frequency [Hz]")
-    axes[0].set_ylabel("PSD [dB re g²/Hz]")
-    axes[-1].legend(loc="upper right", fontsize=7)
-    fig.suptitle("PADRE (Bebop 2): Welch PSD, healthy vs single-rotor faults on rotor A", y=1.03)
-    return _save(fig, "padre_psd_by_imu.png")
-
-
-def spectrograms(padre_recs, dpb_recs):
-    by = {r.meta["code"]: r for r in padre_recs}
-    dp = {r.experiment_id: r for r in dpb_recs}
-    panels = [(by["0000"], "A_acc_z", "PADRE 0000 healthy, IMU A acc z", 256, 250),
-              (by["3000"], "A_acc_z", "PADRE 3000 (A cut-off tip), IMU A acc z", 256, 250),
-              (dp["F0_SV0_SP2_C1_R1"], "piezo", "DronePropB F0 SP2 C1 R1 healthy, piezo", 4096, 600),
-              (dp["F1_SV3_SP2_C1"], "piezo", "DronePropB F1 SV3 SP2 C1, piezo", 4096, 600)]
-    fig, axes = plt.subplots(2, 2, figsize=(11, 6))
-    for ax, (r, ch, title, nps, fmax) in zip(axes.ravel(), panels):
-        x = r.signals[r.ch_names.index(ch)]
-        f, t, S = spectrogram(x - x.mean(), r.fs, nperseg=nps, noverlap=nps // 2)
-        m = f <= fmax
-        im = ax.pcolormesh(t, f[m], 10 * np.log10(S[m] + 1e-20), shading="auto", cmap=SEQ)
-        ax.set_title(title); ax.set_ylabel("Hz"); ax.set_xlabel("time [s]"); ax.grid(False)
-        fig.colorbar(im, ax=ax, label="dB")
-    fig.tight_layout()
-    return _save(fig, "spectrograms.png")
-
-
-def dpb_psd_severity(dpb_recs, F=1, SP=2, C=1):
-    dp = {r.experiment_id: r for r in dpb_recs}
-    ids = [f"F0_SV0_SP{SP}_C{C}_R1"] + [f"F{F}_SV{s}_SP{SP}_C{C}" for s in (1, 2, 3)]
-    fig, ax = plt.subplots(figsize=(7.5, 3.4))
-    for k, i in enumerate(ids):
-        f, p = _psd(dp[i].signals[0], dp[i].fs, 16384)
-        m = f <= 700
-        ax.plot(f[m], p[m], color=SERIES[k], lw=1.1, label=i)
-    ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("PSD [dB]")
-    ax.set_title(f"DronePropB piezo PSD, F{F} severity SV0..SV3 at SP{SP}, C{C}")
-    ax.legend(fontsize=7)
-    return _save(fig, "dpb_psd_severity.png")
-
-
-def notch_effect(padre_recs, dpb_recs):
-    by = {r.meta["code"]: r for r in padre_recs}
-    dp = {r.experiment_id: r for r in dpb_recs}
-    fig, axes = plt.subplots(1, 2, figsize=(11, 3.4))
-    for ax, (r, ch, band, nps, fmax, title) in zip(axes, [
-            (by["3000"], "A_acc_z", (60, 245), 256, 250, "PADRE 3000, IMU A acc z"),
-            (dp["F1_SV3_SP2_C1"], "piezo", (80, 115), 4096, 600, "DronePropB F1 SV3 SP2 C1, piezo")]):
-        W, _ = make_windows(r.signals, r.fs, 1.0, 0.5)
-        f, P = welch(W, r.fs, nperseg=nps, axis=-1)
-        fr = estimate_frot_robust(f, P, band)
-        Wn = notch_windows(W, r.fs, fr)
-        _, Pn = welch(Wn, r.fs, nperseg=nps, axis=-1)
-        j = r.ch_names.index(ch)
-        m = f <= fmax
-        ax.plot(f[m], 10 * np.log10(P[:, j].mean(0)[m]), color=SERIES[0], label="raw")
-        ax.plot(f[m], 10 * np.log10(Pn[:, j].mean(0)[m]), color=SERIES[1],
-                label="notched at 1x, 2x, 3x f_rot (Q=5)")
-        for k in (1, 2, 3):
-            fk = k * np.median(fr)
-            fk = fk if fk <= r.fs / 2 else r.fs - fk
-            if fk <= fmax:
-                ax.axvline(fk, color=INK2, lw=0.6, ls=":")
-        ax.set_title(title); ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("mean PSD [dB]")
-        ax.legend(fontsize=7)
-    fig.suptitle("Software RPM/notch filtering removes the rotor-harmonic lines that carry fault signatures", y=1.03)
-    return _save(fig, "notch_effect.png")
-
-
-def confusion(cm, labels, title, name, xlabel="predicted", ylabel="true"):
-    cmn = cm / np.maximum(cm.sum(1, keepdims=True), 1)
-    fig, ax = plt.subplots(figsize=(1.0 + 0.75 * len(labels), 0.8 + 0.7 * len(labels)))
-    ax.imshow(cmn, cmap=SEQ, vmin=0, vmax=1)
-    ax.grid(False)
-    for i in range(len(labels)):
-        for j in range(len(labels)):
-            ax.text(j, i, f"{cmn[i, j]:.2f}\n({cm[i, j]})", ha="center", va="center", fontsize=7,
-                    color="#fcfcfb" if cmn[i, j] > 0.55 else INK)
-    ax.set_xticks(range(len(labels)), labels, rotation=30, ha="right")
-    ax.set_yticks(range(len(labels)), labels)
-    ax.set_xlabel(xlabel); ax.set_ylabel(ylabel); ax.set_title(title, fontsize=9)
+def spectrogram_with_erpm(F, name="spectrogram_erpm_tracks.png", fmax=800):
+    """Raw roll-rate spectrogram (top) and the same with each motor's 1x/2x from eRPM (bottom)."""
+    f, t, S = spectrogram(F.gyro_unfilt[:, 0] - F.gyro_unfilt[:, 0].mean(), F.fs,
+                          nperseg=2048, noverlap=1536)
+    m = f <= fmax
+    SdB = 10 * np.log10(S[m] + 1e-12)
+    fig, axes = plt.subplots(2, 1, figsize=(9, 6), sharex=True)
+    step = max(1, len(F.t) // 1500)
+    for ax in axes:
+        ax.pcolormesh(t, f[m], SdB, cmap=SEQ, shading="auto", vmin=np.percentile(SdB, 50))
+        ax.grid(False); ax.set_ylim(0, fmax); ax.set_ylabel("Frequency [Hz]")
+    for k in range(4):
+        for h, ls in ((1, "-"), (2, "--")):
+            axes[1].plot(F.t[::step], h * F.f_motor[::step, k], ls, color=SERIES[k + 1], lw=0.7,
+                         alpha=0.85, label=f"{MOTORS[k]}" if h == 1 else None)
+    axes[0].set_title(f"{F.name}: gyroUnfilt roll spectrogram (as logged)", fontsize=9)
+    axes[1].set_title("Same, with each motor's rotation frequency from eRPM: 1x (solid), 2x (dashed)",
+                      fontsize=9)
+    axes[1].set_xlabel("Time [s]")
+    axes[1].legend(loc="upper right", fontsize=7, ncol=4, frameon=True, facecolor=SURF)
     return _save(fig, name)
 
 
-def energy_vs_severity(rec):
-    fig, axes = plt.subplots(1, 2, figsize=(10, 3.3), sharey=False)
-    for ax, col, lab in zip(axes, ["dE_total_dB", "dH1_dB"],
-                            ["total band energy change [dB]", "1x-harmonic level change [dB]"]):
-        for k, sp in enumerate(sorted(rec.meta_SP.unique())):
-            d = rec[rec.meta_SP == sp]
-            jitter = (k - 1) * 0.18
-            ax.scatter(d.label_severity + jitter, d[col], s=22, color=SERIES[k], label=f"SP{sp}",
-                       edgecolor=SURF, linewidth=0.8)
-            means = d.groupby("label_severity")[col].mean()
-            ax.plot(means.index + jitter, means.values, color=SERIES[k], lw=1.0)
-        ax.axhline(0, color=INK2, lw=0.7)
-        ax.set_xticks([0, 1, 2, 3], ["SV0", "SV1", "SV2", "SV3"])
-        ax.set_ylabel(lab); ax.set_xlabel("severity level")
-    axes[0].legend(fontsize=7)
-    fig.suptitle("DronePropB piezo: spectral energy change vs healthy mean at the same speed (one dot = one recording)", y=1.03)
-    return _save(fig, "dpb_energy_vs_severity.png")
-
-
-def raw_vs_notch_bars(table, name, title):
-    """table: DataFrame with index=task/model rows and columns ['raw','notched']."""
-    fig, ax = plt.subplots(figsize=(8, 0.5 + 0.45 * len(table)))
-    y = np.arange(len(table))
-    ax.barh(y + 0.2, table["raw"], height=0.38, color=SERIES[0], label="raw")
-    ax.barh(y - 0.2, table["notched"], height=0.38, color=SERIES[1], label="notch-filtered")
-    for yy, (a, b) in zip(y, table[["raw", "notched"]].to_numpy()):
-        ax.text(a + 0.01, yy + 0.2, f"{a:.2f}", va="center", fontsize=7, color=INK2)
-        ax.text(b + 0.01, yy - 0.2, f"{b:.2f}", va="center", fontsize=7, color=INK2)
-    ax.set_yticks(y, table.index); ax.invert_yaxis()
-    ax.set_xlim(0, 1.1); ax.set_xlabel("balanced accuracy"); ax.set_title(title, pad=22)
-    ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=2, fontsize=7)
+def unfilt_vs_filtered_psd(F, name="betaflight_unfilt_vs_filtered_psd.png"):
+    air = F.f_motor.min(axis=1) > 200
+    fig, ax = plt.subplots(figsize=(8, 3.4))
+    for j, (x, lab) in enumerate(((F.gyro_unfilt[air, 0], "gyroUnfilt roll (before Betaflight filters)"),
+                                  (F.gyro_filt[air, 0], "gyroADC roll (after Betaflight filters)"))):
+        f, p = welch(x - x.mean(), F.fs, nperseg=4096)
+        mm = f <= 1200
+        ax.plot(f[mm], 10 * np.log10(p[mm] + 1e-12), color=SERIES[j], label=lab, lw=1.2)
+    fm = F.f_motor[air]
+    lo, hi = np.percentile(fm, [5, 95])
+    for h, a in ((1, 0.18), (2, 0.12), (3, 0.08)):
+        ax.axvspan(h * lo, h * hi, color=SERIES[2], alpha=a, lw=0,
+                   label="motor 1x / 2x / 3x range (eRPM, p5-p95)" if h == 1 else None)
+    ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("PSD [dB, gyro log units²/Hz]")
+    ax.set_title(f"{F.name}: Betaflight's filters remove the motor lines the monitor needs", fontsize=9)
+    ax.legend(fontsize=7, loc="lower left")
     return _save(fig, name)
 
 
-# ----------------------------------------------------------------- PADRE-only figures
-def padre_spectrograms(recs):
-    by = {r.meta["code"]: r for r in recs}
+def levels_by_flight(new, old, name="1x_levels_by_flight.png"):
+    """One dot per 1 s window, one column per flight; new-prop flights first, then old-prop."""
+    fig, axes = plt.subplots(1, 4, figsize=(13, 3.6), sharey=True)
+    for k, ax in enumerate(axes):
+        i = 0
+        for gi, (lab, ps) in enumerate((("new props", new), ("old props", old))):
+            for p in ps:
+                L = 20 * np.log10(p.orders_unfilt[:, k, 0])
+                ax.scatter(np.full(len(L), i), L, s=4, alpha=0.3, color=SERIES[gi], lw=0,
+                           label=lab if p is ps[0] else None)
+                ax.scatter([i], [np.median(L)], s=30, marker="_", color=INK, lw=1.5)
+                i += 1
+        ax.set_title(f"{MOTORS[k]}"); ax.set_xlabel("Flight")
+        ax.set_xticks(range(i)); ax.set_xticklabels([])
+    axes[0].set_ylabel("1x vibration level [dB]")
+    axes[0].legend(fontsize=7, markerscale=3, loc="lower left")
+    fig.suptitle("Each motor's once-per-revolution vibration, per 1 s window (black tick = flight median)",
+                 y=1.03)
+    return _save(fig, name)
+
+
+def raw_vs_tracked(P_old, P_new, band, name="raw_spectrum_vs_order_tracking.png"):
+    """Left: raw gyro spectrum (cannot tell the flights apart). Right: order spectrum around
+    motor M1's rotation speed (order 1.00 = exactly once per revolution of M1)."""
+    from order_tracking import spectrum_true_time, tracked_orders
+    fig, axes = plt.subplots(1, 2, figsize=(12, 3.5))
+    ax = axes[0]
+    freqs = np.arange(200.0, 400.5, 1.0)
+    for j, (P, lab) in enumerate(((P_new, f"new props ({P_new.flight.name})"),
+                                  (P_old, f"old props ({P_old.flight.name})"))):
+        F = P.flight
+        air = F.f_motor.min(axis=1) > 200
+        p = spectrum_true_time(F.gyro_unfilt[air], F.t[air], int(round(F.fs)), freqs)
+        ax.plot(freqs, 10 * np.log10(p + 1e-12), color=SERIES[j], label=lab, lw=1.2)
+    ax.axvspan(band[0], band[1], color=SERIES[2], alpha=0.13, lw=0,
+               label=f"motor-speed band ({band[0]:g}-{band[1]:g} Hz)")
+    ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("gyroUnfilt spectrum, 3 axes [dB]")
+    ax.set_title("Raw spectrum: four motor lines smeared into one hump", fontsize=9)
+    ax.legend(fontsize=7, loc="upper left")
+    ax = axes[1]
+    orders = np.round(np.arange(0.90, 1.1001, 0.005), 3)
+    for j, (P, lab) in enumerate(((P_new, "new props"), (P_old, "old props"))):
+        A = tracked_orders(P.flight.gyro_unfilt, P.theta[:, :1], P.starts, P.win, orders)[:, 0, :]
+        ax.plot(orders, 10 * np.log10(np.median(A ** 2, axis=0)), color=SERIES[j], label=lab, lw=1.4)
+    ax.axvline(1.0, color=INK2, ls=":", lw=0.8)
+    ax.set_xlabel("Order relative to motor M1 (1.00 = once per M1 revolution)")
+    ax.set_ylabel("Tracked level [dB]")
+    ax.set_title("Order tracking on M1: the same sharp line at exactly 1.00 with both prop sets", fontsize=9)
+    ax.legend(fontsize=7, loc="upper left")
+    return _save(fig, name)
+
+
+def flight_scores(diag, thr, name="diagnosis_flight_scores.png"):
+    fig, ax = plt.subplots(figsize=(9, 3.4))
+    x = np.arange(len(diag))
+    col = [SERIES[0] if p == "new" else SERIES[1] for p in diag.props]
+    ax.bar(x, diag.flight_score, color=col, width=0.65)
+    ax.axhline(thr, color=INK2, ls="--", lw=1)
+    ax.text(len(diag) - 0.5, thr + 0.06, f"alarm above {thr:g}", ha="right", fontsize=8, color=INK2)
+    for i, (v, a, m) in enumerate(zip(diag.flight_score, diag.alarm, diag.worst_motor)):
+        ax.text(i, max(v, 0) + 0.06, f"{v:.1f}" + (f"\n{m}" if a else ""), ha="center", fontsize=7)
+    ax.set_xticks(x); ax.set_xticklabels(diag.flight, rotation=40, ha="right", fontsize=7)
+    ax.set_ylabel("Flight score (highest motor's median z)")
+    ax.set_ylim(min(0, diag.flight_score.min()) - 0.2, diag.flight_score.max() + 0.7)
+    from matplotlib.patches import Patch
+    ax.legend(handles=[Patch(color=SERIES[0], label="new props (each tested against the other 10)"),
+                       Patch(color=SERIES[1], label="old props (tested against all 11 new-prop flights)")],
+              fontsize=7, loc="upper left")
+    ax.set_title("Flight score on real flights: no flight reaches the alarm level, with either prop set",
+                 fontsize=9)
+    return _save(fig, name)
+
+
+def change_by_motor(diag, name="diagnosis_change_by_motor.png"):
+    fig, ax = plt.subplots(figsize=(8, 3.6))
+    new, old = diag[diag.props == "new"], diag[diag.props == "old"]
+    cols = [f"change_dB_{m}" for m in MOTORS]
+    x = np.arange(4)
+    lo, hi = new[cols].min().to_numpy(), new[cols].max().to_numpy()
+    ax.bar(x, hi - lo, bottom=lo, width=0.8, color=GRID, label="range over the 11 new-prop flights", zorder=1)
+    w = 0.8 / len(old)
+    for i, (_, r) in enumerate(old.iterrows()):
+        ax.bar(x - 0.4 + (i + 0.5) * w, r[cols].to_numpy(float), width=w * 0.85, color=SERIES[1],
+               alpha=0.55 + 0.45 * i / max(1, len(old) - 1), zorder=2,
+               label="old-prop flights (log_1 ... log_6, left to right)" if i == 0 else None)
+    med = old[cols].median().to_numpy()
+    for k in range(4):
+        ax.text(k, max(old[cols[k]].max(), hi[k]) + 0.8, f"median {med[k]:+.0f} dB", ha="center", fontsize=8)
+    ax.axhline(0, color=INK2, lw=0.8)
+    ax.set_xticks(x); ax.set_xticklabels(MOTORS)
+    ax.set_ylabel("Change in 1x vibration energy [dB]\nvs new-prop baseline")
+    ax.set_ylim(min(lo.min(), old[cols].min().min()) - 2, old[cols].max().max() + 4)
+    ax.set_title("Old-prop flights vs new-prop baseline: change in each motor's 1x vibration",
+                 fontsize=9)
+    ax.legend(fontsize=7, loc="upper right")
+    return _save(fig, name)
+
+
+def example_scores(t, z_clean, z_inj, thr, motor, ratio, flight, name="synthetic_example.png"):
     fig, axes = plt.subplots(1, 2, figsize=(11, 3.3), sharey=True)
-    for ax, code, title in [(axes[0], "0000", "0000 healthy"), (axes[1], "3000", "3000 (rotor A cut-off tip)")]:
-        r = by[code]
-        x = r.signals[r.ch_names.index("A_acc_z")]
-        f, t, S = spectrogram(x - x.mean(), r.fs, nperseg=256, noverlap=128)
-        im = ax.pcolormesh(t, f, 10 * np.log10(S + 1e-20), shading="auto", cmap=SEQ, vmin=-60, vmax=20)
-        ax.set_title(f"PADRE {title}, IMU A acc z"); ax.set_xlabel("time [s]"); ax.grid(False)
-    axes[0].set_ylabel("Frequency [Hz]")
-    fig.colorbar(im, ax=axes, label="dB")
-    return _save(fig, "padre_spectrograms.png")
+    for ax, z, title in ((axes[0], z_clean, f"{flight}: as flown"),
+                         (axes[1], z_inj, f"{flight}: + SYNTHETIC imbalance on {MOTORS[motor]}, "
+                                          f"r = {ratio:g}")):
+        for k in range(4):
+            ax.plot(t, z[:, k], color=SERIES[k], lw=1.1, label=MOTORS[k])
+        ax.axhline(thr, color=INK2, ls="--", lw=1, label="alarm threshold")
+        ax.set_title(title, fontsize=9); ax.set_xlabel("Window start [s]")
+    axes[0].set_ylabel("Robust z-score of 1x level")
+    axes[1].legend(fontsize=7, ncol=5, loc="upper left")
+    return _save(fig, name)
 
 
-def padre_notch_effect(recs, code="3000"):
-    r = {x.meta["code"]: x for x in recs}[code]
-    W, _ = make_windows(r.signals, r.fs, 1.0, 0.5)
-    f, P = welch(W, r.fs, nperseg=256, axis=-1)
-    fr = estimate_frot_robust(f, P, (60, 245))
-    _, Pn = welch(notch_windows(W, r.fs, fr), r.fs, nperseg=256, axis=-1)
-    j = r.ch_names.index("A_acc_z")
-    fig, ax = plt.subplots(figsize=(7, 3.3))
-    ax.plot(f, 10 * np.log10(P[:, j].mean(0)), color=SERIES[0], label="raw")
-    ax.plot(f, 10 * np.log10(Pn[:, j].mean(0)), color=SERIES[1], label="notched at 1x, 2x, 3x f_rot (Q=5)")
-    for k in (1, 2, 3):
-        fk = k * np.median(fr)
-        fk = fk if fk <= r.fs / 2 else r.fs - fk          # aliased harmonic
-        ax.axvline(fk, color=INK2, lw=0.6, ls=":")
-    ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("mean PSD [dB re g²/Hz]")
-    ax.set_title(f"PADRE {code}, IMU A acc z: software RPM/notch filter removes the fault line", fontsize=9)
+def detection_curve(by_r, name="synthetic_detection_vs_size.png"):
+    fig, ax = plt.subplots(figsize=(6.2, 3.4))
+    x = by_r.index.to_numpy()
+    ax.plot(x, by_r["flights_alarmed"], "o-", color=SERIES[0], label="flights alarmed")
+    ax.plot(x, by_r["correct_motor"], "^-", color=SERIES[2], label="correct motor named")
+    ax.set_xscale("log", base=2); ax.set_xticks(x); ax.set_xticklabels([f"{v:g}" for v in x])
+    ax.set_ylim(-0.02, 1.05)
+    ax.set_xlabel("Injected imbalance ratio r (x normal 1x amplitude)"); ax.set_ylabel("Rate")
+    ax.set_title("SYNTHETIC imbalance added to new-prop flights (leave-one-flight-out)", fontsize=9)
+    ax.legend(fontsize=7, loc="upper left")
+    return _save(fig, name)
+
+
+def confusion(cm, title, name):
+    fig, ax = plt.subplots(figsize=(3.8, 3.4))
+    ax.imshow(cm, cmap=SEQ, vmin=0)
+    ax.grid(False)
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            ax.text(j, i, str(cm[i, j]), ha="center", va="center",
+                    color=SURF if cm[i, j] > cm.max() * 0.55 else INK, fontsize=9)
+    ax.set_xticks(range(4)); ax.set_xticklabels(MOTORS)
+    ax.set_yticks(range(4)); ax.set_yticklabels(MOTORS)
+    ax.set_xlabel("Located motor"); ax.set_ylabel("Motor with injected imbalance")
+    ax.set_title(title, fontsize=9)
+    return _save(fig, name)
+
+
+def severity_plot(inj, name="synthetic_severity_estimate.png"):
+    fig, ax = plt.subplots(figsize=(5.2, 3.6))
+    for k, m in enumerate(MOTORS):
+        d = inj[inj.motor == m]
+        jit = (k - 1.5) * 0.25
+        ax.scatter(d.severity_nominal_dB + jit, d.severity_est_dB, s=10, alpha=0.6, color=SERIES[k],
+                   label=m, lw=0)
+    lim = [min(-6, inj.severity_est_dB.min() - 1), inj.severity_nominal_dB.max() + 2]
+    ax.plot(lim, lim, color=INK2, lw=1, ls="--", label="estimate = injected")
+    ax.set_xlabel("Injected 1x energy increase, 10·log10(1+r²) [dB]")
+    ax.set_ylabel("Measured 1x energy increase [dB]")
+    ax.set_title("Severity = change in the motor's 1x energy vs healthy", fontsize=9)
     ax.legend(fontsize=7)
-    return _save(fig, "padre_notch_effect.png")
-
-
-def padre_energy_by_type(t):
-    order = ["chipped edge", "bent tip", "cut-off tip", "bent tip + cut-off tip"]
-    fig, axes = plt.subplots(1, 2, figsize=(10, 3.3))
-    for ax, col, lab in zip(axes, ["dH1_dB (own IMU acc z)", "dE_total_dB (own IMU acc z)"],
-                            ["1x-harmonic level change [dB]", "total band energy change [dB]"]):
-        t = t[t.sensor_ok]
-        for k, rot in enumerate("ABCD"):
-            d = t[t.faulty_rotor == rot]
-            xs = [order.index(v) + (k - 1.5) * 0.12 for v in d.fault_type]
-            ax.scatter(xs, d[col], s=30, color=SERIES[k], label=f"fault on rotor {rot}",
-                       edgecolor=SURF, linewidth=0.8, zorder=3)
-        m = t.groupby("fault_type")[col].mean().reindex(order)
-        ax.plot(range(4), m.values, color=INK2, lw=1.0, label="mean")
-        ax.axhline(0, color=INK2, lw=0.7)
-        ax.set_xticks(range(4), order, rotation=15)
-        ax.set_ylabel(lab)
-    axes[0].legend(fontsize=7)
-    fig.suptitle("PADRE single-fault flights: vibration change on the faulty rotor's IMU vs healthy flight 0000\n(flight 0040 excluded: IMU C acc z dead/stuck)", y=1.06)
-    return _save(fig, "padre_energy_by_fault_type.png")
+    return _save(fig, name)

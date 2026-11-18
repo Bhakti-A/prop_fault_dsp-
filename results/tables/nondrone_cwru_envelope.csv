@@ -1,4 +1,0 @@
-file,fault,rpm,fs_assumed,dominant_env_peak_Hz,BPFI_theory_Hz,BPFI_env_amp_rel_median,BPFO_theory_Hz,BPFO_env_amp_rel_median,BSF_theory_Hz,BSF_env_amp_rel_median
-105,inner race,1797.0,12000.0,161.7,162.2,191.9,107.4,5.3,141.2,14.8
-118,ball,1796.0,12000.0,30.0,162.1,10.9,107.3,11.0,141.1,5.4
-130,outer race,1796.0,12000.0,107.6,162.1,3.4,107.3,846.9,141.1,20.8

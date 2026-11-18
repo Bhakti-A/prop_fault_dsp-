@@ -2,8 +2,8 @@
 .venv/
 __pycache__/
 *.pyc
-# datasets (download with scripts/download_padre.py; third-party data, not redistributed)
-data/raw/*
-data/processed/*
-!data/raw/.gitkeep
-!data/processed/.gitkeep
+# flight logs (own blackbox CSVs; copy them into data/air75/, see README)
+data/*
+!data/air75/
+data/air75/*
+!data/air75/.gitkeep
