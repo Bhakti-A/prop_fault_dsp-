@@ -1,0 +1,4 @@
+date,logs,M1_peer_dB_median,M2_peer_dB_median,M3_peer_dB_median,M4_peer_dB_median,M3_drive_per_speed_median,M3_speed_offset_hz_median
+2026-09-01,4,2.4,-3.25,-3.95,4.0,1.0,6.05
+2026-09-15,3,2.5,-9.1,2.8,-0.9,1.041,-1.6
+2026-09-20/22,16,5.1,-5.3,8.0,-7.35,1.076,-16.4

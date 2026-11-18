@@ -1,4 +1,0 @@
-|                        |   alarm |   no alarm |
-|:-----------------------|--------:|-----------:|
-| old props (5 flights)  |       0 |          5 |
-| new props (11 flights) |       0 |         11 |

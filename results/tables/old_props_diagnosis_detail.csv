@@ -1,6 +1,0 @@
-flight,props,windows_flagged,flight_score,alarm,worst_motor,change_dB_M1,change_dB_M2,change_dB_M3,change_dB_M4,alarm_at_808Hz,worst_motor_at_808Hz,change_dB_M1_at_808Hz
-log_1,old,0.0,-0.9,False,M3,-10.07,-10.81,-4.91,-10.95,False,M3,-10.01
-log_2,old,0.0,0.47,False,M1,1.15,2.24,-1.75,1.17,False,M1,1.39
-log_3,old,0.0,0.25,False,M2,0.51,1.26,-2.61,-0.54,False,M2,0.48
-log_5,old,0.0,0.78,False,M1,1.93,-0.06,-3.84,-2.42,False,M1,2.29
-log_6,old,0.0,0.93,False,M1,2.3,0.15,-1.76,0.13,False,M1,2.49

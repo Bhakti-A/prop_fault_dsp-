@@ -1,0 +1,4 @@
+date,drive_per_speed_M1,drive_per_speed_M2,drive_per_speed_M3,drive_per_speed_M4,speed_offset_hz_M1,speed_offset_hz_M2,speed_offset_hz_M3,speed_offset_hz_M4
+2026-09-01,1.007,0.992,1.0,1.0,5.1,-7.2,6.05,-5.15
+2026-09-15,1.006,0.982,1.041,0.991,23.5,3.1,-1.6,-3.1
+2026-09-20/22,1.024,0.976,1.076,0.956,13.3,8.05,-16.4,-8.05

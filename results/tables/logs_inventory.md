@@ -1,0 +1,96 @@
+| date          | file              | used   | reason                            |   log_rate_hz |   duration_s |   airborne_windows |
+|:--------------|:------------------|:-------|:----------------------------------|--------------:|-------------:|-------------------:|
+| 2026-09-20/22 | 8_1.csv           | True   |                                   |           824 |         32.8 |                 60 |
+| 2026-09-20/22 | 8_2.csv           | True   |                                   |           824 |         33.4 |                 62 |
+| 2026-09-20/22 | 8_3.csv           | True   |                                   |           824 |         29.6 |                 54 |
+| 2026-09-20/22 | 8_4.csv           | True   |                                   |           824 |         43.3 |                 82 |
+| 2026-09-20/22 | 8_5.csv           | True   |                                   |           824 |         49.5 |                 94 |
+| 2026-09-20/22 | 8_6.csv           | True   |                                   |           824 |         40.8 |                 74 |
+| 2026-09-20/22 | FC dataflash.csv  | True   |                                   |           824 |         16.8 |                 25 |
+| 2026-09-20/22 | FC dataflash2.csv | True   |                                   |           824 |         33.8 |                 62 |
+| 2026-09-20/22 | FC dataflash3.csv | True   |                                   |           824 |         41.9 |                 78 |
+| 2026-09-20/22 | FC dataflash4.csv | True   |                                   |           824 |         47.5 |                 88 |
+| 2026-09-20/22 | FC dataflash5.csv | True   |                                   |           824 |         30.1 |                 54 |
+| 2026-09-20/22 | log_1.csv         | True   |                                   |          3232 |         42.9 |                 77 |
+| 2026-09-20/22 | log_2.csv         | True   |                                   |          3232 |         28.6 |                 49 |
+| 2026-09-20/22 | log_3.csv         | True   |                                   |          3233 |         33.1 |                 62 |
+| 2026-09-20/22 | log_5.csv         | True   |                                   |          3232 |         28.8 |                 48 |
+| 2026-09-20/22 | log_6.csv         | True   |                                   |          3232 |         29.4 |                 53 |
+| 2026-09-01    | 09-01_log.01      | True   |                                   |           824 |         57.3 |                113 |
+| 2026-09-01    | 09-01_log.02      | True   |                                   |           823 |         23.1 |                 45 |
+| 2026-09-01    | 09-01_log.03      | False  | under ~10 s airborne (0 windows)  |           823 |          1.7 |                  0 |
+| 2026-09-01    | 09-01_log.04      | True   |                                   |           823 |         24   |                 47 |
+| 2026-09-01    | 09-01_log.05      | False  | under ~10 s airborne (7 windows)  |           824 |         16.1 |                  7 |
+| 2026-09-01    | 09-01_log.06      | False  | under ~10 s airborne (0 windows)  |           821 |          3.4 |                  0 |
+| 2026-09-01    | 09-01_log.07      | False  | under ~10 s airborne (0 windows)  |           823 |          2.5 |                  0 |
+| 2026-09-01    | 09-01_log.08      | False  | under ~10 s airborne (0 windows)  |           823 |          0.4 |                  0 |
+| 2026-09-01    | 09-01_log.09      | False  | under ~10 s airborne (0 windows)  |           822 |          7.8 |                  0 |
+| 2026-09-01    | 09-01_log.10      | False  | under ~10 s airborne (0 windows)  |           823 |          0.6 |                  0 |
+| 2026-09-01    | 09-01_log.11      | False  | under ~10 s airborne (0 windows)  |           823 |          0.7 |                  0 |
+| 2026-09-01    | 09-01_log.12      | True   |                                   |           824 |         87.8 |                 22 |
+| 2026-09-01    | 09-01_log.13      | False  | under ~10 s airborne (8 windows)  |           824 |          9   |                  8 |
+| 2026-09-01    | 09-01_log.14      | False  | under ~10 s airborne (8 windows)  |           820 |         13.5 |                  8 |
+| 2026-09-01    | 09-01_log.15      | False  | under ~10 s airborne (0 windows)  |           823 |          1.7 |                  0 |
+| 2026-09-01    | 09-01_log.16      | False  | under ~10 s airborne (0 windows)  |           824 |          3.6 |                  0 |
+| 2026-09-01    | 09-01_log.17      | False  | under ~10 s airborne (0 windows)  |           823 |          4.9 |                  0 |
+| 2026-09-01    | 09-01_log.18      | False  | under ~10 s airborne (0 windows)  |           821 |          7.6 |                  0 |
+| 2026-09-01    | 09-01_log.19      | False  | under ~10 s airborne (0 windows)  |           824 |          4.1 |                  0 |
+| 2026-09-01    | 09-01_log.20      | False  | under ~10 s airborne (2 windows)  |           824 |         13.3 |                  2 |
+| 2026-09-01    | 09-01_log.21      | False  | under ~10 s airborne (0 windows)  |           824 |          3.1 |                  0 |
+| 2026-09-01    | 09-01_log.22      | False  | under ~10 s airborne (0 windows)  |           824 |          3.7 |                  0 |
+| 2026-09-01    | 09-01_log.23      | False  | under ~10 s airborne (0 windows)  |           824 |          1.7 |                  0 |
+| 2026-09-01    | 09-01_log.24      | False  | under ~10 s airborne (0 windows)  |           823 |          7.7 |                  0 |
+| 2026-09-01    | 09-01_log.25      | False  | under ~10 s airborne (0 windows)  |           823 |          0.3 |                  0 |
+| 2026-09-01    | 09-01_log.26      | False  | under ~10 s airborne (0 windows)  |           823 |          0.3 |                  0 |
+| 2026-09-01    | 09-01_log.27      | False  | under ~10 s airborne (4 windows)  |           824 |         13.1 |                  4 |
+| 2026-09-01    | 09-01_log.28      | False  | under ~10 s airborne (0 windows)  |           824 |         13.8 |                  0 |
+| 2026-09-01    | 09-01_log.29      | False  | under ~10 s airborne (0 windows)  |           824 |          1.5 |                  0 |
+| 2026-09-01    | 09-01_log.30      | False  | under ~10 s airborne (2 windows)  |           824 |         17.7 |                  2 |
+| 2026-09-01    | 09-01_log.31      | False  | under ~10 s airborne (0 windows)  |           824 |          1.8 |                  0 |
+| 2026-09-01    | 09-01_log.32      | False  | under ~10 s airborne (0 windows)  |           824 |          1.7 |                  0 |
+| 2026-09-01    | 09-01_log.33      | False  | under ~10 s airborne (0 windows)  |           823 |          4.9 |                  0 |
+| 2026-09-01    | 09-01_log.34      | False  | under ~10 s airborne (2 windows)  |           824 |          7.6 |                  2 |
+| 2026-09-01    | 09-01_log.35      | False  | under ~10 s airborne (0 windows)  |           822 |          2   |                  0 |
+| 2026-09-01    | 09-01_log.36      | False  | under ~10 s airborne (0 windows)  |           822 |          4.7 |                  0 |
+| 2026-09-01    | 09-01_log.37      | False  | under ~10 s airborne (0 windows)  |           824 |         33   |                  0 |
+| 2026-09-01    | 09-01_log.38      | False  | under ~10 s airborne (0 windows)  |           824 |          2.4 |                  0 |
+| 2026-09-01    | 09-01_log.39      | False  | under ~10 s airborne (0 windows)  |           824 |          1.8 |                  0 |
+| 2026-09-01    | 09-01_log.40      | False  | under ~10 s airborne (0 windows)  |           824 |          4.2 |                  0 |
+| 2026-09-01    | 09-01_log.41      | False  | under ~10 s airborne (0 windows)  |           824 |          9.7 |                  0 |
+| 2026-09-01    | 09-01_log.42      | False  | under ~10 s airborne (0 windows)  |           823 |          3.8 |                  0 |
+| 2026-09-01    | 09-01_log.43      | False  | under ~10 s airborne (0 windows)  |           823 |          1.7 |                  0 |
+| 2026-09-01    | 09-01_log.44      | False  | under ~10 s airborne (0 windows)  |           824 |          3   |                  0 |
+| 2026-09-01    | 09-01_log.45      | False  | under ~10 s airborne (0 windows)  |           824 |          1.1 |                  0 |
+| 2026-09-01    | 09-01_log.46      | False  | under ~10 s airborne (0 windows)  |           824 |          2.2 |                  0 |
+| 2026-09-01    | 09-01_log.47      | False  | under ~10 s airborne (0 windows)  |           824 |          8.5 |                  0 |
+| 2026-09-01    | 09-01_log.48      | False  | under ~10 s airborne (0 windows)  |           824 |          3.4 |                  0 |
+| 2026-09-01    | 09-01_log.49      | False  | under ~10 s airborne (2 windows)  |           824 |         63.6 |                  2 |
+| 2026-09-01    | 09-01_log.50      | False  | under ~10 s airborne (0 windows)  |           823 |          3.2 |                  0 |
+| 2026-09-01    | 09-01_log.51      | False  | under ~10 s airborne (0 windows)  |           824 |          3.3 |                  0 |
+| 2026-09-01    | 09-01_log.52      | False  | under ~10 s airborne (0 windows)  |           824 |          1.9 |                  0 |
+| 2026-09-01    | 09-01_log.53      | False  | under ~10 s airborne (0 windows)  |           820 |          1.3 |                  0 |
+| 2026-09-01    | 09-01_log.54      | False  | under ~10 s airborne (0 windows)  |           824 |          1.2 |                  0 |
+| 2026-09-01    | 09-01_log.55      | False  | under ~10 s airborne (0 windows)  |           824 |          1   |                  0 |
+| 2026-09-01    | 09-01_log.56      | False  | under ~10 s airborne (0 windows)  |           816 |          1.8 |                  0 |
+| 2026-09-01    | 09-01_log.57      | False  | under ~10 s airborne (0 windows)  |           824 |          5   |                  0 |
+| 2026-09-01    | 09-01_log.58      | False  | under ~10 s airborne (0 windows)  |           824 |          1.7 |                  0 |
+| 2026-09-01    | 09-01_log.59      | False  | under ~10 s airborne (0 windows)  |           824 |          1   |                  0 |
+| 2026-09-01    | 09-01_log.60      | False  | under ~10 s airborne (0 windows)  |           821 |          1.9 |                  0 |
+| 2026-09-01    | 09-01_log.61      | False  | under ~10 s airborne (0 windows)  |           817 |          0.9 |                  0 |
+| 2026-09-01    | 09-01_log.62      | False  | under ~10 s airborne (0 windows)  |           821 |          1.7 |                  0 |
+| 2026-09-01    | 09-01_log.63      | False  | under ~10 s airborne (0 windows)  |           823 |          1.7 |                  0 |
+| 2026-09-01    | 09-01_log.64      | False  | under ~10 s airborne (0 windows)  |           824 |          1.7 |                  0 |
+| 2026-09-01    | 09-01_log.65      | False  | under ~10 s airborne (0 windows)  |           824 |          1.4 |                  0 |
+| 2026-09-15    | 09-15_log.01      | False  | under ~10 s airborne (0 windows)  |          3231 |          1.8 |                  0 |
+| 2026-09-15    | 09-15_log.02      | False  | under ~10 s airborne (0 windows)  |          3233 |          2.5 |                  0 |
+| 2026-09-15    | 09-15_log.03      | False  | under ~10 s airborne (0 windows)  |          3232 |          2.2 |                  0 |
+| 2026-09-15    | 09-15_log.04      | True   |                                   |          3230 |         33.3 |                 38 |
+| 2026-09-15    | 09-15_log.05      | False  | under ~10 s airborne (12 windows) |          3233 |         21.4 |                 12 |
+| 2026-09-15    | 09-15_log.06      | False  | under ~10 s airborne (14 windows) |          3232 |          9.3 |                 14 |
+| 2026-09-15    | 09-15_log.07      | True   |                                   |          3234 |         14.8 |                 27 |
+| 2026-09-15    | 09-15_log.08      | False  | under ~10 s airborne (16 windows) |          3235 |         11   |                 16 |
+| 2026-09-15    | 09-15_log.09      | False  | under ~10 s airborne (10 windows) |          3231 |          8.2 |                 10 |
+| 2026-09-15    | 09-15_log.10      | False  | under ~10 s airborne (0 windows)  |          3234 |          1.3 |                  0 |
+| 2026-09-15    | 09-15_log.11      | True   |                                   |          3232 |         29   |                 35 |
+| 2026-09-15    | 09-15_log.12      | False  | under ~10 s airborne (6 windows)  |          3232 |          7.6 |                  6 |
+| 2026-09-15    | 09-15_log.13      | False  | under ~10 s airborne (0 windows)  |          3232 |          3.2 |                  0 |

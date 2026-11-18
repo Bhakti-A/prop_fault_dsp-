@@ -1,0 +1,5 @@
+motor,flights_flagged,flights_severe,median_dB,min_dB,max_dB,verdict
+M1,5 / 16,0,5.1,0.0,7.5,normal
+M2,0 / 16,0,-5.3,-6.5,-1.4,normal
+M3,13 / 16,0,8.0,4.5,9.1,fault
+M4,0 / 16,0,-7.3,-12.1,-0.1,normal

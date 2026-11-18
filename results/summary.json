@@ -1,210 +1,94 @@
 {
- "flights": {
-  "new": {
-   "flights": 11,
-   "windows": 724,
-   "log_time_s": 399.5
-  },
-  "old": {
-   "flights": 5,
-   "windows": 284,
-   "log_time_s": 162.8
-  }
- },
- "L1x_dB": {
-  "new M1": {
-   "min": 32.8,
-   "median": 36.4,
-   "max": 38.2
-  },
-  "new M2": {
-   "min": 22.3,
-   "median": 26.3,
-   "max": 29.9
-  },
-  "new M3": {
-   "min": 19.6,
-   "median": 24.9,
-   "max": 26.4
-  },
-  "new M4": {
-   "min": 22.4,
-   "median": 23.6,
-   "max": 30.7
-  },
-  "old M1": {
-   "min": 26.6,
-   "median": 37.8,
-   "max": 39.0
-  },
-  "old M2": {
-   "min": 15.1,
-   "median": 26.0,
-   "max": 28.1
-  },
-  "old M3": {
-   "min": 19.1,
-   "median": 21.4,
-   "max": 22.2
-  },
-  "old M4": {
-   "min": 13.3,
-   "median": 23.7,
-   "max": 25.4
-  }
+ "fault_level_dB": 6.0,
+ "severe_level_dB": 12.0,
+ "main_flights": 16,
+ "main_airborne_windows": 1022,
+ "extra_logs": {
+  "decoded": 78,
+  "used": 7
  },
  "betaflight_filter_attenuation_dB": {
-  "new": {
-   "min": 26.2,
-   "median": 31.4,
-   "max": 42.9
+  "min": 32.9,
+  "median": 39.25,
+  "max": 48.9
+ },
+ "diagnosis_summary": [
+  {
+   "motor": "M1",
+   "flights_flagged": "5 / 16",
+   "flights_severe": 0,
+   "median_dB": 5.1,
+   "min_dB": 0.0,
+   "max_dB": 7.5,
+   "verdict": "normal"
   },
-  "old": {
-   "min": 24.1,
-   "median": 33.8,
-   "max": 41.6
+  {
+   "motor": "M2",
+   "flights_flagged": "0 / 16",
+   "flights_severe": 0,
+   "median_dB": -5.3,
+   "min_dB": -6.5,
+   "max_dB": -1.4,
+   "verdict": "normal"
+  },
+  {
+   "motor": "M3",
+   "flights_flagged": "13 / 16",
+   "flights_severe": 0,
+   "median_dB": 8.0,
+   "min_dB": 4.5,
+   "max_dB": 9.1,
+   "verdict": "fault"
+  },
+  {
+   "motor": "M4",
+   "flights_flagged": "0 / 16",
+   "flights_severe": 0,
+   "median_dB": -7.3,
+   "min_dB": -12.1,
+   "max_dB": -0.1,
+   "verdict": "normal"
   }
- },
- "new_props_as_flown": {
-  "flights": 11,
-  "flights_alarmed": 0,
-  "flight_score_max": 0.9183884547174219,
-  "windows_flagged": 0.009668508287292817,
-  "change_dB_min": -4.789693519961911,
-  "change_dB_max": 6.687230164645051
- },
- "synthetic_by_ratio": {
-  "r=0.25": {
-   "injected_increase_dB": 0.263,
-   "cases": 132,
-   "flights_alarmed": 0.0,
-   "correct_motor": 0.25,
-   "measured_increase_dB": 0.426,
-   "abs_error_dB": 1.208
-  },
-  "r=0.5": {
-   "injected_increase_dB": 0.969,
-   "cases": 132,
-   "flights_alarmed": 0.0,
-   "correct_motor": 0.364,
-   "measured_increase_dB": 1.179,
-   "abs_error_dB": 1.083
-  },
-  "r=1": {
-   "injected_increase_dB": 3.01,
-   "cases": 132,
-   "flights_alarmed": 0.015,
-   "correct_motor": 0.773,
-   "measured_increase_dB": 3.107,
-   "abs_error_dB": 0.622
-  },
-  "r=2": {
-   "injected_increase_dB": 6.99,
-   "cases": 132,
-   "flights_alarmed": 0.288,
-   "correct_motor": 1.0,
-   "measured_increase_dB": 7.046,
-   "abs_error_dB": 0.432
-  },
-  "r=4": {
-   "injected_increase_dB": 12.304,
-   "cases": 132,
-   "flights_alarmed": 1.0,
-   "correct_motor": 1.0,
-   "measured_increase_dB": 12.301,
-   "abs_error_dB": 0.304
-  },
-  "r=8": {
-   "injected_increase_dB": 18.129,
-   "cases": 132,
-   "flights_alarmed": 1.0,
-   "correct_motor": 1.0,
-   "measured_increase_dB": 18.12,
-   "abs_error_dB": 0.307
-  }
- },
- "synthetic_confusion_r2": [
-  [
-   33,
-   0,
-   0,
-   0
-  ],
-  [
-   0,
-   33,
-   0,
-   0
-  ],
-  [
-   0,
-   0,
-   33,
-   0
-  ],
-  [
-   0,
-   0,
-   0,
-   33
-  ]
  ],
- "raw_band_power_dB": {
-  "new": {
-   "min": 39.4,
-   "median": 42.8,
-   "max": 43.5
+ "M1_windows_at_fault_median": 0.365,
+ "M3_windows_at_fault_median": 0.765,
+ "unflagged_motors_M2_M4_peer_dB_range": [
+  -12.1,
+  -0.1
+ ],
+ "log_rate_check_max_abs_diff_dB": 0.19,
+ "trend_by_date": {
+  "2026-09-01": {
+   "logs": 4,
+   "M1_peer_dB_median": 2.4,
+   "M2_peer_dB_median": -3.25,
+   "M3_peer_dB_median": -3.95,
+   "M4_peer_dB_median": 4.0,
+   "M3_drive_per_speed_median": 1.0,
+   "M3_speed_offset_hz_median": 6.05
   },
-  "old": {
-   "min": 38.5,
-   "median": 42.3,
-   "max": 43.7
+  "2026-09-15": {
+   "logs": 3,
+   "M1_peer_dB_median": 2.5,
+   "M2_peer_dB_median": -9.1,
+   "M3_peer_dB_median": 2.8,
+   "M4_peer_dB_median": -0.9,
+   "M3_drive_per_speed_median": 1.041,
+   "M3_speed_offset_hz_median": -1.6
+  },
+  "2026-09-20/22": {
+   "logs": 16,
+   "M1_peer_dB_median": 5.1,
+   "M2_peer_dB_median": -5.3,
+   "M3_peer_dB_median": 8.0,
+   "M4_peer_dB_median": -7.35,
+   "M3_drive_per_speed_median": 1.076,
+   "M3_speed_offset_hz_median": -16.4
   }
  },
- "old_props_diagnosis": {
-  "flights": 5,
-  "flights_alarmed": 0,
-  "flight_score_min": -0.8968691477258504,
-  "flight_score_max": 0.934240159661033,
-  "worst_motor": {
-   "M1": 3,
-   "M3": 1,
-   "M2": 1
-  },
-  "median_change_dB_M1": 1.147866039197138,
-  "median_change_dB_M2": 0.14547757792931154,
-  "median_change_dB_M3": -2.6092890908094213,
-  "median_change_dB_M4": -0.5447872102794031,
-  "alarmed_at_808Hz": 0,
-  "worst_motor_at_808Hz": {
-   "M1": 3,
-   "M3": 1,
-   "M2": 1
-  },
-  "max_abs_change_in_M1_reading_at_808Hz_dB": 0.3595682539404419
- },
- "detection_summary": {
-  "old props (5 flights)": {
-   "alarm": 0,
-   "no alarm": 5
-  },
-  "new props (11 flights)": {
-   "alarm": 0,
-   "no alarm": 11
-  }
- },
- "settings": {
-  "window_s": 1.0,
-  "overlap": 0.5,
-  "ratios": [
-   0.25,
-   0.5,
-   1,
-   2,
-   4,
-   8
-  ],
-  "phases_per_case": 3,
-  "flight_alarm_median_z": 1.5
- }
+ "M3_drive_per_speed_main_range": [
+  1.041,
+  1.105
+ ],
+ "M3_slowest_in_main_flights": 14
 }

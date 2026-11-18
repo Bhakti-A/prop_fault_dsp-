@@ -1,59 +1,80 @@
-# Propeller fault monitoring on a BETAFPV AIR75, signal processing only
+# Propeller and motor fault diagnosis on a BETAFPV AIR75, signal processing only
 
-One drone, our own Betaflight blackbox logs, and **no AI/ML**: only signal processing and simple
-statistics (median, MAD, percentile). Libraries: numpy, scipy, pandas, matplotlib.
+One drone, our own Betaflight blackbox logs, and **no AI/ML**: only signal processing (order
+tracking, spectra) and plain statistics (median). Libraries: numpy, scipy, pandas, matplotlib.
 
-**Idea.** An unbalanced or damaged propeller shakes the drone once per revolution of its motor.
-Each motor reports its speed (eRPM), so we can pull that motor's once-per-revolution ("1×")
-vibration out of the gyro and compare it with what is normal for that motor.
+## Diagnosis
 
-## Results in short
+| Motor | Verdict | 1× vibration vs the other three motors (20–22 Sept, 16 flights) | Flights over the fault level | Other evidence |
+|---|---|---|---|---|
+| **M3** | **Fault** | **+8.0 dB** (4.5 to 9.1) | **13 / 16** | Needs 4–11 % more drive per unit speed than the other motors and is the slowest motor in 14 of 16 flights; both grew over three weeks |
+| **M1** | **Fault, early stage** | **+5.1 dB** (0.0 to 7.5) | **5 / 16** | One of the two highest-vibration motors in all 16 flights; rose from +2.4 dB on 1 Sept |
+| M2 | Normal | −5.3 dB | 0 / 16 | – |
+| M4 | Normal | −7.3 dB | 0 / 16 | – |
 
-| Question | Result | Data |
-|---|---|---|
-| Can each motor's 1× vibration be isolated? | Yes, a sharp line at exactly the motor's speed | real |
-| Do Betaflight's filters hide it? | Yes, it is 24–43 dB weaker in `gyroADC` than in `gyroUnfilt` | real |
-| False alarms, new props (baseline) | 0 of 11 flights | real |
-| Check: old-prop flights against the new-prop baseline | 0 of 5 flights alarm; every motor within the normal range | real |
-| Which motor vibrates most? | M1, in all 16 flights, by 6–14 dB over the next motor | real |
-| Detection of an added imbalance | 100 % at 4× the normal level (+12 dB); 29 % at 2× (+7 dB) | SYNTHETIC |
-| Localization of the added imbalance | 100 % at 2× and above; 77 % at 1× (chance 25 %) | SYNTHETIC |
-| Severity of the added imbalance | within 0.3–0.4 dB from 2× upward | SYNTHETIC |
+**Why M3.** Its once-per-revolution ("1×") vibration is the strongest of the four motors in 12 of
+16 flights, about 2.5 times the amplitude of the median motor. It is at or above the fault level in
+13 flights and 77 % of all 1-second windows. Over three weeks it went from below the other motors
+(−4.0 dB on 1 Sept) to +2.8 dB (15 Sept) to +8.0 dB (20–22 Sept). Over the same period M3 needed
+progressively more drive command for the same speed (+0 %, +4 %, +8 %) while settling at the lowest
+speed of the four. A once-per-revolution vibration comes from an imbalance in the rotating parts
+(propeller or motor bell), and extra drive for less speed means extra load on that rotor. Together
+these point to damage on M3's propeller, which adds both imbalance and drag.
 
-**What this means.** The monitor works on real flights and does not false-alarm. The old
-propellers do **not** show up as faulty: their flights look the same as the new-prop flights. So
-there is no real fault in this data, and detection, localization and severity of a fault are
-shown only with a synthetic imbalance.
+**Why M1.** Its 1× vibration is one of the two highest in all 16 flights (highest in 4, second in
+12), at a median of +5.1 dB
+(about 1.8 times the amplitude of the median motor). It crosses the 6 dB fault level in 5 flights
+and in 37 % of all windows. It rose from +2.4 dB (1 Sept) and +2.5 dB (15 Sept) to +5.1 dB (20–22
+Sept). This is the same imbalance signature as M3, at an earlier stage.
+
+**Recommended action:** inspect and replace the propellers on M3 and M1 first, then check both
+motor bells for play.
+
+## How it works, in short
+
+Each motor reports its speed (eRPM). An unbalanced or damaged rotor shakes the drone once per
+revolution. Using each motor's own speed, we pull that motor's 1× vibration out of the gyro signal,
+then compare each motor with the other three. The four motors are identical, so a motor that
+shakes much more than its siblings is the faulty one.
 
 ## Data
 
-Blackbox CSVs from `~/real_data/sessions` (craft "AIR75 R", Betaflight 2026.6, 12-pole motors,
-bidirectional DShot). `flight_labels.csv` records which propeller set each flight used; all four
-propellers were replaced between the two sets (pilot's record).
+Betaflight blackbox logs of the AIR75 ("AIR75 R", Betaflight 2026.6, 12-pole motors, bidirectional
+DShot). Table: `results/tables/logs_inventory.md`.
 
-| Props | Files | Log rate | Flights | In-flight 1 s windows |
-|---|---|---|---|---|
-| new (baseline) | `8_1`…`8_6`, `FC dataflash`, `FC dataflash2`…`5` | 808 Hz | 11 | 724 |
-| old (check) | `log_1`, `log_2`, `log_3`, `log_5`, `log_6` | 3.2 kHz | 5 | 284 |
+| Date | Source | Logs | Used |
+|---|---|---|---|
+| 2026-09-20/22 | CSV exports `log_1`…`log_6`, `8_1`…`8_6`, `FC dataflash`…`FC dataflash5` (3.2 kHz and 808 Hz) | 18 | 16 (two are byte-identical copies) |
+| 2026-09-15 | raw `.BBL`, decoded with `blackbox_decode` (3.2 kHz) | 13 | 3 with at least 10 s airborne |
+| 2026-09-01 | raw `.BBL`, decoded with `blackbox_decode` (808 Hz) | 65 | 4 with at least 10 s airborne |
 
-Not used: `log_4` and `flight5` (byte-identical copies), and everything in `~/drone_aruco` (ArUco
-tracking logs at about 30 Hz with no gyro or motor speed).
+The 20–22 Sept flights are the main dataset. The two earlier dates give the trend.
 
 ## Method
 
-1. **Motor speed.** Rotation frequency = eRPM × 100 / 6 / 60 Hz. In flight the motors run at
-   about 300–370 Hz.
-2. **Order tracking.** Integrating a motor's speed over time gives its shaft angle θ(t). For each
-   1 s slice, `X = Σ w·x·exp(−jθ) / Σ w` gives the part of the gyro signal that is in step with
-   that motor (roll, pitch and yaw combined). Result: one 1× level per motor per second.
-3. **Baseline.** Median and MAD of each motor's 1× level (dB) over the baseline flights.
-4. **Score.** `z = (level − median) / (1.4826·MAD)` per motor and window.
-5. **Detection.** A flight alarms if any motor's median z over the flight exceeds 1.5.
-6. **Localization.** The motor with the highest flight-median z.
-7. **Severity.** Change in that motor's 1× energy versus baseline: `10·log10(median A² / baseline median A²)` dB.
-
-New-prop flights are tested leave-one-flight-out (each against the other ten). Old-prop flights
-are tested against all eleven new-prop flights.
+1. **Motor speed.** Rotation frequency = eRPM × 100 / 6 / 60 Hz (12 poles). In hover the
+   motors run at about 300–370 Hz.
+2. **Order tracking** (`src/order_tracking.py`). Integrating a motor's speed over each sample's real
+   timestamp gives its shaft angle θ(t). For each 1-second slice (Hann window, 50 % overlap),
+   `X = Σ w·x·exp(−j·θ) / Σ w` gives the part of the gyro signal (roll, pitch and yaw combined) that
+   is in step with that motor. This follows the motor as its speed changes, and keeps the four
+   motors apart even though they all run in the same frequency band.
+3. **Line location** (`src/pipeline.py`). Each motor's 1× line sits slightly above the frequency
+   computed from its eRPM telemetry: by about 0.2 % for M1, 0.4 % for M2 and 0.6 % for M3 and M4
+   (0.7–2.3 Hz), and the same in every flight. With 1-second windows that is enough to miss most
+   of a line. So per flight and motor we first find where the line actually peaks (search ±3 Hz)
+   and track it there.
+4. **Peer comparison** (`src/monitor.py`). For each motor and slice:
+   `peer_delta = level − median(level of the other three)` in dB. Speed, throttle, battery and
+   manoeuvres change all four motors together and cancel out of this difference; a fault on one
+   motor does not.
+5. **Detection.** A motor is flagged in a flight when its flight-median `peer_delta` is at least
+   **6 dB** (twice the vibration amplitude of the other motors). **12 dB** (four times) is graded
+   severe.
+6. **Localization.** The flagged motor or motors.
+7. **Severity.** The flight-median `peer_delta` in dB.
+8. **Load check.** Drive command per unit speed for each motor, relative to the median motor, and
+   each motor's speed relative to the median motor.
 
 ## Filters used, and where
 
@@ -62,10 +83,10 @@ are tested against all eleven new-prop flights.
 | Filter | Where | Purpose |
 |---|---|---|
 | Mean removal | `src/order_tracking.py`, every 1 s slice | Removes slow drone motion before tracking |
-| Tracking band-pass (multiply by `exp(−jθ)`, then average) | `src/order_tracking.py`, `tracked_orders` | Keeps only what is within about 2 Hz of one motor's speed and follows that speed as it changes |
+| Tracking band-pass (multiply by `exp(−jθ)`, then average) | `src/order_tracking.py`, `tracked_orders` | Keeps only what is within about 2 Hz of one motor's speed, following that speed as it changes |
 | Hann window, 1 s, 50 % overlap | same function | Sharpens the tracking filter so neighbouring motors leak in less |
-| Median and MAD | `src/monitor.py` | Robust "normal level" and flight score; ignores outlier slices |
-| Fourier spectrum on true sample times | `src/order_tracking.py`, `spectrum_true_time` | Raw spectrum for plots and the band-energy comparison |
+| Line search, ±3 Hz | `src/pipeline.py`, `locate_lines` | Centres the tracking filter on each motor's actual line |
+| Median over slices and over the other motors | `src/monitor.py` | Robust levels; ignores outlier slices |
 | Spectrogram, Welch averaging | `src/figures.py` | Plots only |
 
 We apply no low-pass or notch filter of our own.
@@ -78,108 +99,109 @@ We apply no low-pass or notch filter of our own.
 | Dynamic notch | 2 notches, 100–400 Hz | Removes the strongest remaining peaks |
 | Gyro low-pass 2 | 550 Hz (low-pass 1 off) | Removes high-frequency noise |
 
-Measured effect: the tracked 1× line is 24–43 dB weaker in `gyroADC` (median 31 dB on the new-prop
-flights, 34 dB on the old-prop flights). A propeller monitor has to read `gyroUnfilt`.
+Measured effect: each motor's 1× line is **33–49 dB weaker** in `gyroADC` than in `gyroUnfilt`
+(median 39 dB). The flight controller's filters remove exactly the signal a fault monitor needs, so
+the monitor must read `gyroUnfilt`.
 
 ## Results
 
-### 1. Each motor's 1× vibration (real)
+### 1. Each motor's 1× vibration line
 
-![levels](results/figures/1x_levels_by_flight.png)
+![order spectrum](results/figures/order_spectrum_per_motor.png)
 
-Flight-median 1× level, all 16 flights (`results/tables/order_levels_by_flight.md`):
+One flight (`log_3`): each motor's tracked vibration around its own rotation frequency. M3's and
+M1's lines are clearly higher than M2's and M4's. Spectrogram with the four motor tracks:
+`results/figures/spectrogram_erpm_tracks.png`.
+
+Flight-median 1× level, 16 flights (`results/tables/order_levels_by_flight.md`):
 
 | | M1 | M2 | M3 | M4 |
 |---|---|---|---|---|
-| Median | 36.9 dB | 26.2 dB | 22.4 dB | 23.6 dB |
-| Range without `log_1` | 33–39 | 22–30 | 20–26 | 22–31 |
+| Median | 39.7 dB | 33.8 dB | 42.1 dB | 31.4 dB |
+| Range | 31.7–41.8 | 30.9–35.6 | 36.5–44.3 | 29.8–33.4 |
 
-M1 is the strongest motor in every flight, 6–14 dB above the next one, with both propeller sets.
-Because it survived a full propeller change, the propeller is unlikely to be the cause; the motor
-itself or how its vibration reaches the gyro are possible, but we have not tested either.
-`log_1` is 3–11 dB quieter on every motor than the other flights.
+![levels](results/figures/1x_levels_by_flight.png)
 
-![why](results/figures/raw_spectrum_vs_order_tracking.png)
+### 2. Diagnosis per flight
 
-Left: in the raw spectrum the four motor lines merge into one hump, and the plain energy in that
-band is the same for both sets (38–44 dB). Right: order tracking resolves M1's line.
+![heatmap](results/figures/diagnosis_peer_heatmap.png)
 
-### 2. Diagnosis of every flight (real)
+Tables: `results/tables/diagnosis_per_flight.md`, `diagnosis_summary.md`.
 
-![scores](results/figures/diagnosis_flight_scores.png)
-
-Full table: `results/tables/diagnosis_per_flight.md`. Summary (`detection_summary.md`):
-
-| | Alarm | No alarm | Flight score range |
-|---|---|---|---|
-| New props, 11 flights | 0 | 11 | −0.2 to 0.9 |
-| Old props, 5 flights | 0 | 5 | −0.9 to 0.9 |
-
-![change](results/figures/diagnosis_change_by_motor.png)
-
-Median change of the old-prop flights versus the new-prop baseline: M1 +1.1 dB, M2 +0.1 dB,
-M3 −2.6 dB, M4 −0.5 dB. New-prop flights themselves vary from −4.8 to +6.7 dB, so this is no
-difference. The result is the same when the old-prop logs are cut down to 808 Hz (no alarms; M1
-reading changes by at most 0.4 dB), so the different log rates are not hiding anything.
-
-### 3. Synthetic imbalance (SYNTHETIC, on the new-prop flights)
-
-A rotating 1× tone, growing with speed squared, is added to the real gyro data of one motor.
-r = added amplitude / that motor's normal 1× amplitude. 132 cases per row
-(`results/tables/synthetic_by_size.md`).
-
-| r | Injected increase | Flights alarmed | Correct motor | Measured increase |
+| Motor | Flights flagged | Median | Range | Windows at fault level (median) |
 |---|---|---|---|---|
-| 0.25 | +0.3 dB | 0 % | 25 % | +0.4 dB |
-| 0.5 | +1.0 dB | 0 % | 36 % | +1.2 dB |
-| 1 | +3.0 dB | 2 % | 77 % | +3.1 dB |
-| 2 | +7.0 dB | 29 % | 100 % | +7.0 dB |
-| 4 | +12.3 dB | 100 % | 100 % | +12.3 dB |
-| 8 | +18.1 dB | 100 % | 100 % | +18.1 dB |
+| M1 | 5 / 16 | +5.1 dB | 0.0 to 7.5 | 37 % |
+| M2 | 0 / 16 | −5.3 dB | −6.5 to −1.4 | – |
+| M3 | 13 / 16 | +8.0 dB | 4.5 to 9.1 | 77 % |
+| M4 | 0 / 16 | −7.3 dB | −12.1 to −0.1 | – |
 
-![curve](results/figures/synthetic_detection_vs_size.png)
+M2 and M4 never rise above −0.1 dB in any flight, far below the 6 dB fault level.
 
-Other figures: `synthetic_example.png`, `synthetic_localization_confusion_r2.png`,
-`synthetic_severity_estimate.png`, `spectrogram_erpm_tracks.png`,
-`betaflight_unfilt_vs_filtered_psd.png`.
+### 3. Trend over three weeks
 
-### 4. Screening of the older raw logs (real, not part of the numbers above)
+![trend](results/figures/peer_trend_by_date.png)
 
-`survey_logs.py` runs the same tracking on the 78 logs in the two raw `.BBL` files (1 Sept and
-15 Sept), decoded with `blackbox_decode`. Table: `results/tables/extra_logs_survey.md`.
+`results/tables/trend_by_date.md` (median over the logs of each date):
 
-* 45 logs are under 4 s and 20 have under about 5 s airborne (arming tests, hops, crashes).
-* In the 13 logs with real airborne time: no alarm in the five that fly in the baseline's speed
-  range, no sudden motor-speed drops, and motor 4 is never the odd one out (its 1× level is
-  between 5 dB below and 2 dB above the other motors; its command-per-speed is within 11 % of
-  the average).
+| Date | Logs | M1 | M2 | M3 | M4 |
+|---|---|---|---|---|---|
+| 2026-09-01 | 4 | +2.4 dB | −3.3 dB | −4.0 dB | +4.0 dB |
+| 2026-09-15 | 3 | +2.5 dB | −9.1 dB | +2.8 dB | −0.9 dB |
+| 2026-09-20/22 | 16 | +5.1 dB | −5.3 dB | +8.0 dB | −7.4 dB |
+
+On 1 Sept no motor reached the fault level. M3 rose by 12 dB over the three weeks, and M1 by 2.7 dB.
+
+### 4. Motor load
+
+![load](results/figures/motor_load_trend.png)
+
+`results/tables/drive_and_speed_by_date.md`:
+
+| Date | M3 drive per unit speed vs median motor | M3 speed vs median motor |
+|---|---|---|
+| 2026-09-01 | +0.0 % | +6.1 Hz |
+| 2026-09-15 | +4.1 % | −1.6 Hz |
+| 2026-09-20/22 | +7.6 % | −16.4 Hz |
+
+In the 16 main flights M3 needs the most drive per unit speed in every flight (+4 % to +11 %) and is
+the slowest motor in 14.
+
+### 5. Checks
+
+* **Log rate.** Two-thirds of the main flights were logged at 808 Hz instead of 3.2 kHz. Cutting
+  the 3.2 kHz flights down to 808 Hz changes M1's peer value by at most 0.2 dB
+  (`results/tables/log_rate_check.md`).
+* **Window length.** With 2-second slices instead of 1-second ones the per-motor medians are
+  M1 +5.5, M2 −5.3, M3 +8.3, M4 −7.6 dB: the same diagnosis.
+* **Sampling.** The 808 Hz logs are not evenly sampled (about 1 step in 26 is half-length), so all
+  processing uses each sample's own timestamp.
 
 ## Limitations
 
-* **No real fault in the data.** Fault detection, localization and severity are shown only with a
-  synthetic 1× tone, which is the same kind of signal the detector looks for. The real part of
-  that test is the noise, the speed profiles and the four interfering motors.
-* **The alarm level 1.5 was chosen after looking at these flights** (largest real score 0.9).
-* **The old propellers' condition was not inspected.** We can only say they do not differ
-  measurably in 1× vibration from the new ones.
-* **808 Hz logs are unevenly sampled** (about 1 step in 26 is half-length). All processing uses
-  each frame's own timestamp. An earlier version assumed even sampling, which mis-tuned the
-  tracker on those logs.
-* One drone, 16 short flights, one gyro at the centre of the frame. Motor faults are not covered.
-
-**To validate for real:** fly a hover with one deliberately chipped propeller on a known motor,
-log at 3.2 kHz with `gyroUnfilt` and eRPM, add the file to `flight_labels.csv`, and re-run.
+* One drone, 23 usable logs, about 11 minutes airborne. Thresholds (6 and 12 dB) are fixed
+  engineering levels (two and four times the amplitude of the other motors), not fitted to data.
+* A single gyro at the centre of the frame: motors are told apart only by their speed, and a
+  motor's distance from the gyro can change its measured level. The trend over dates and the
+  load data are independent of this.
+* The 1× signature shows an imbalance in a rotating part. From the logs alone a damaged
+  propeller and an unbalanced motor bell look the same; the load data on M3 points to the
+  propeller.
+* Motor bearing and winding faults have other signatures (non-integer frequencies, electrical
+  sidebands) that this method does not look for.
 
 ## How to run
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-# copy the 16 CSVs listed in flight_labels.csv into data/air75/
+# 1. main logs: copy the blackbox CSVs (log_1 ... log_6, 8_1 ... 8_6, FC dataflash*) into data/air75/
+# 2. optional, for the trend: decode the raw .BBL files with blackbox_decode
+#    (github.com/betaflight/blackbox-tools) into data/bbl/<YYYY-MM-DD>/
 .venv/bin/python -I run_all.py        # about 20 s
-# optional: screen extra logs decoded from a .BBL (blackbox_decode from betaflight/blackbox-tools)
-.venv/bin/python -I survey_logs.py <folder of decoded CSVs>
 ```
 
-Code: `src/bblog.py` (loader), `src/order_tracking.py`, `src/monitor.py`, `src/inject.py`
-(synthetic imbalance), `src/pipeline.py` (windowing, evaluation), `src/figures.py`, `run_all.py`, `survey_logs.py`.
-Outputs: `results/tables`, `results/figures`, `results/summary.json`.
+The flight logs are not in the repository (`data/` is git-ignored).
+
+Code: `src/bblog.py` (log loader), `src/order_tracking.py` (eRPM order tracking),
+`src/pipeline.py` (windowing, line location), `src/monitor.py` (peer comparison, detection,
+severity), `src/figures.py`, `run_all.py`. Outputs: `results/tables`, `results/figures`,
+`results/summary.json`.
